@@ -41,6 +41,12 @@ contract DAO
     // allow contract to receive Ether
     receive() external payable {}
 
+    modifier onlyInvestor()
+    {
+        require(Token(token).balanceOf(msg.sender) > 0, "must be token holder");
+        _;
+    }
+
     // proposals
     // Examples:
     // 1. Send 100 ETH to Tom
@@ -51,8 +57,10 @@ contract DAO
     string memory _name,
     uint256 _amount,
     address payable _recipient
-    ) external
+    ) external onlyInvestor
     {
+        require(address(this).balance >= _amount);
+
         proposalCount += 1;
         // create a Proposal
         proposals[proposalCount] = 
