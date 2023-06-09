@@ -120,4 +120,53 @@ describe('DAO', () =>
   
     })
 
+    describe('Voting', () =>
+    {
+        let transaction, result
+
+        beforeEach(async () =>
+        {
+            transaction = await dao.connect(investor1).createProposal('Proposal 1', ether(100), recipient.address)
+            result = await transaction.wait()
+        })
+
+        describe('Success', () =>
+        {
+            beforeEach(async () =>
+            {   
+                // vote on the first proposal, i.e. proposal 1
+                transaction = await dao.connect(investor1).vote(1)
+                result = await transaction.wait()
+            })
+
+            it('updates the vote count', async () =>
+            {
+                // proposals mapping at key 1
+                const proposal = await dao.proposals(1)
+                expect(proposal.votes).to.equal(tokens(200000))
+            })
+
+            it('emits a vote event', async () =>
+            {
+                await expect(transaction).to.emit('Vote').withArgs(1, investor1.address)
+            })
+        })
+
+        describe('Failure', () =>
+        {
+            it('rejects a non-investor', async () =>
+            {
+                await expect(dao.connect(user).vote(1)).to.be.reverted
+            })
+
+            it('rejects double voting', async () =>
+            {
+                transaction = await dao.connect(investor1).vote(1)
+                await transaction.wait()
+
+                await expect(dao.connect(investor1).vote(1)).to.be.reverted
+            })
+        })
+    })
+
 })
