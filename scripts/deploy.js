@@ -22,7 +22,7 @@ async function main() {
   const DAO = await hre.ethers.getContractFactory('DAO')
   let dao = await DAO.deploy(token.address, hre.ethers.utils.parseUnits('500001', 'ether'))
   await dao.deployed()
-  console.log(`Token deployed to: ${dao.address}\n`)
+  console.log(`DAO deployed to: ${dao.address}\n`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
