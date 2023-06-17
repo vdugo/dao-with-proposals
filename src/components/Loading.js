@@ -6,7 +6,7 @@ const Loading = () => {
             <Spinner animation="grow" />
             <p className='my-2'>Loading Data...</p>
         </div>
-    );
+    )
 }
 
 export default Loading
