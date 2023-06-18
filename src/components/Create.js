@@ -10,14 +10,26 @@ const Create = ({provider, dao, setIsLoading}) =>
     const [name, setName] = useState('')
     const [amount, setAmount] = useState(0)
     const [address, setAddress] = useState('')
+    const [isWaiting, setIsWaiting] = useState(false)
 
     const createHandler = async (event) =>
     {
         event.preventDefault()
-        console.log('Creating proposal with args:')
-        console.log(name)
-        console.log(amount)
-        console.log(address)
+        setIsWaiting(true)
+
+        try
+        {
+            const signer = await provider.getSigner()
+            const formattedAmount = ethers.utils.parseUnits(amount.toString(), 'ether')
+    
+            const transaction = await dao.connect(signer).createProposal(name, formattedAmount, address)
+            await transaction.wait()
+        }
+        catch
+        {
+            window.alert('User rejected or transaction reverted')
+        }
+
     }
     return(
         <Form onSubmit={createHandler}>
@@ -40,7 +52,11 @@ const Create = ({provider, dao, setIsLoading}) =>
                 className='my-2'
                 onChange={(event) => setAddress(event.target.value)}
                 />
+                {
+                isWaiting? <Spinner animation='border' style={{display: 'block', margin: '0 auto'}}/> 
+                :
                 <Button variant='primary' type='submit' style={{width: '100%'}}>Create Proposal</Button>
+                }
             </Form.Group>
         </Form>
     )
